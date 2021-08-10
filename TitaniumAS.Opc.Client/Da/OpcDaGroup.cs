@@ -25,7 +25,7 @@ namespace TitaniumAS.Opc.Client.Da
     public class OpcDaGroup : IDisposable, IOpcDaGroup
     {
         private static readonly ILog Log = LogManager.GetLogger<OpcDaGroup>();
-        private readonly List<OpcDaItem> _items = new List<OpcDaItem>();
+        private readonly List<OpcDaItem> _items = new();
         private AsyncRequestManager _asyncRequestManager;
         private int _clientHandle;
         private bool _disposed;
@@ -161,10 +161,10 @@ namespace TitaniumAS.Opc.Client.Da
             CheckSupported(OpcDaGroupFeatures.ReadMaxAgeAsync);
 
             if (maxAge == null)
-                throw new ArgumentNullException("maxAge");
+                throw new ArgumentNullException(nameof(maxAge));
 
             if (items.Count != maxAge.Count)
-                throw new ArgumentException("Invalid size of maxAge.", "maxAge");
+                throw new ArgumentException("Invalid size of maxAge.", nameof(maxAge));
 
 
             var request = new ReadMaxAgeAsyncRequest(As<OpcAsyncIO3>());
@@ -363,7 +363,7 @@ namespace TitaniumAS.Opc.Client.Da
         public TimeSpan UpdateRate
         {
             get { return _updateRate; }
-            set { SetState(new OpcDaGroupState {UpdateRate = value}); }
+            set { SetState(new OpcDaGroupState { UpdateRate = value }); }
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace TitaniumAS.Opc.Client.Da
         public int ClientHandle
         {
             get { return _clientHandle; }
-            set { SetState(new OpcDaGroupState {ClientHandle = value}); }
+            set { SetState(new OpcDaGroupState { ClientHandle = value }); }
         }
 
         /// <summary>
@@ -398,7 +398,7 @@ namespace TitaniumAS.Opc.Client.Da
         public bool IsActive
         {
             get { return _isActive; }
-            set { SetState(new OpcDaGroupState {IsActive = value}); }
+            set { SetState(new OpcDaGroupState { IsActive = value }); }
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace TitaniumAS.Opc.Client.Da
         public TimeSpan TimeBias
         {
             get { return _timeBias; }
-            set { SetState(new OpcDaGroupState {TimeBias = value}); }
+            set { SetState(new OpcDaGroupState { TimeBias = value }); }
         }
 
         /// <summary>
@@ -422,7 +422,7 @@ namespace TitaniumAS.Opc.Client.Da
         public float PercentDeadband
         {
             get { return _percentDeadband; }
-            set { SetState(new OpcDaGroupState {PercentDeadband = value}); }
+            set { SetState(new OpcDaGroupState { PercentDeadband = value }); }
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace TitaniumAS.Opc.Client.Da
         public CultureInfo Culture
         {
             get { return _culture; }
-            set { SetState(new OpcDaGroupState {Culture = value}); }
+            set { SetState(new OpcDaGroupState { Culture = value }); }
         }
 
         /// <summary>
@@ -502,12 +502,11 @@ namespace TitaniumAS.Opc.Client.Da
         /// </returns>
         public OpcDaItemValue[] Read(IList<OpcDaItem> items, OpcDaDataSource dataSource = OpcDaDataSource.Cache)
         {
-            CheckItems(items);  
+            CheckItems(items);
             CheckSupported(OpcDaGroupFeatures.Read);
             int[] serverHandles = ArrayHelpers.GetServerHandles(items);
 
-            HRESULT[] ppErrors;
-            OPCITEMSTATE[] ppItemValues = As<OpcSyncIO>().Read((OPCDATASOURCE) dataSource, serverHandles, out ppErrors);
+            OPCITEMSTATE[] ppItemValues = As<OpcSyncIO>().Read((OPCDATASOURCE)dataSource, serverHandles, out HRESULT[] ppErrors);
             OpcDaItemValue[] result = OpcDaItemValue.Create(this, ppItemValues, ppErrors);
             OnValuesChanged(new OpcDaItemValuesChangedEventArgs(result));
             return result;
@@ -554,33 +553,17 @@ namespace TitaniumAS.Opc.Client.Da
         /// <param name="feature">The feature.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentOutOfRangeException">feature;null</exception>
-        public bool IsSupported(OpcDaGroupFeatures feature)
-        {
-            switch (feature)
+        public bool IsSupported(OpcDaGroupFeatures feature) =>
+            feature switch
             {
-                case OpcDaGroupFeatures.Read:
-                case OpcDaGroupFeatures.Write:
-                    return Is<OpcSyncIO>();
-                case OpcDaGroupFeatures.ReadAsync:
-                case OpcDaGroupFeatures.WriteAsync:
-                case OpcDaGroupFeatures.RefreshAsync:
-                case OpcDaGroupFeatures.Subscription:
-                    return Is<OpcAsyncIO2>();
-                case OpcDaGroupFeatures.ReadMaxAge:
-                case OpcDaGroupFeatures.WriteVQT:
-                    return Is<OpcSyncIO2>();
-                case OpcDaGroupFeatures.ReadMaxAgeAsync:
-                case OpcDaGroupFeatures.RefreshMaxAgeAsync:
-                case OpcDaGroupFeatures.WriteVQTAsync:
-                    return Is<OpcAsyncIO3>();
-                case OpcDaGroupFeatures.KeepAlive:
-                    return Is<OpcItemMgt>();
-                case OpcDaGroupFeatures.Sampling:
-                    return Is<OpcItemSamplingMgt>();
-                default:
-                    throw new ArgumentOutOfRangeException("feature", feature, null);
-            }
-        }
+                OpcDaGroupFeatures.Read or OpcDaGroupFeatures.Write => Is<OpcSyncIO>(),
+                OpcDaGroupFeatures.ReadAsync or OpcDaGroupFeatures.WriteAsync or OpcDaGroupFeatures.RefreshAsync or OpcDaGroupFeatures.Subscription => Is<OpcAsyncIO2>(),
+                OpcDaGroupFeatures.ReadMaxAge or OpcDaGroupFeatures.WriteVQT => Is<OpcSyncIO2>(),
+                OpcDaGroupFeatures.ReadMaxAgeAsync or OpcDaGroupFeatures.RefreshMaxAgeAsync or OpcDaGroupFeatures.WriteVQTAsync => Is<OpcAsyncIO3>(),
+                OpcDaGroupFeatures.KeepAlive => Is<OpcItemMgt>(),
+                OpcDaGroupFeatures.Sampling => Is<OpcItemSamplingMgt>(),
+                _ => throw new ArgumentOutOfRangeException(nameof(feature), feature, null),
+            };
 
         /// <summary>
         ///     Reads the specified group items using MaxAge. If the information in the cache is within the MaxAge, then the data
@@ -600,15 +583,11 @@ namespace TitaniumAS.Opc.Client.Da
             int[] serverHandles = ArrayHelpers.GetServerHandles(items);
 
             if (serverHandles.Length != maxAge.Count)
-                throw new ArgumentException("Invalid size of maxAge", "maxAge");
+                throw new ArgumentException("Invalid size of maxAge", nameof(maxAge));
 
-//            int[] intMaxAge = ArrayHelpers.CreateMaxAgeArray(maxAge, items.Count);
-
-            DateTimeOffset[] timestamps;
-            HRESULT[] errors;
-            OpcDaQuality[] qualities;
+            //            int[] intMaxAge = ArrayHelpers.CreateMaxAgeArray(maxAge, items.Count);
             object[] ppvValues = As<OpcSyncIO2>()
-                .ReadMaxAge(serverHandles, maxAge, out qualities, out timestamps, out errors);
+                .ReadMaxAge(serverHandles, maxAge, out OpcDaQuality[] qualities, out DateTimeOffset[] timestamps, out HRESULT[] errors);
 
             OpcDaItemValue[] result = OpcDaItemValue.Create(items, ppvValues, qualities, timestamps, errors);
             OnValuesChanged(new OpcDaItemValuesChangedEventArgs(result));
@@ -632,7 +611,7 @@ namespace TitaniumAS.Opc.Client.Da
             int[] serverHandles = ArrayHelpers.GetServerHandles(items);
 
             if (serverHandles.Length != values.Count)
-                throw new ArgumentException("Invalid size of values", "values");
+                throw new ArgumentException("Invalid size of values", nameof(values));
 
             OPCITEMVQT[] vqts = ArrayHelpers.CreateOpcItemVQT(values);
             return As<OpcSyncIO2>().WriteVQT(serverHandles, vqts);
@@ -649,14 +628,13 @@ namespace TitaniumAS.Opc.Client.Da
         public OpcDaItemResult[] AddItems(IList<OpcDaItemDefinition> itemDefinitions)
         {
             if (itemDefinitions == null)
-                throw new ArgumentNullException("itemDefinitions");
+                throw new ArgumentNullException(nameof(itemDefinitions));
             if (itemDefinitions.Count == 0)
-                return new OpcDaItemResult[0];
+                return Array.Empty<OpcDaItemResult>();
 
             OPCITEMDEF[] pItemArray = ArrayHelpers.CreateOPITEMDEFs(itemDefinitions);
 
-            HRESULT[] ppErrors;
-            OPCITEMRESULT[] opcDaItemResults = As<OpcItemMgt>().AddItems(pItemArray, out ppErrors);
+            OPCITEMRESULT[] opcDaItemResults = As<OpcItemMgt>().AddItems(pItemArray, out HRESULT[] ppErrors);
 
             OpcDaItemResult[] results = CreateItemResults(itemDefinitions, pItemArray, opcDaItemResults, ppErrors, true);
 
@@ -693,8 +671,7 @@ namespace TitaniumAS.Opc.Client.Da
         public OpcDaItemResult[] ValidateItems(IList<OpcDaItemDefinition> itemDefinitions, bool blobUpdate = false)
         {
             OPCITEMDEF[] pItemArray = ArrayHelpers.CreateOPITEMDEFs(itemDefinitions);
-            HRESULT[] ppErrors;
-            OPCITEMRESULT[] opcDaItemResults = As<OpcItemMgt>().ValidateItems(pItemArray, blobUpdate, out ppErrors);
+            OPCITEMRESULT[] opcDaItemResults = As<OpcItemMgt>().ValidateItems(pItemArray, blobUpdate, out HRESULT[] ppErrors);
             OpcDaItemResult[] results = CreateItemResults(itemDefinitions, pItemArray, opcDaItemResults, ppErrors, false);
             return results;
         }
@@ -781,7 +758,7 @@ namespace TitaniumAS.Opc.Client.Da
         {
             CheckItems(items);
             if (items.Count != requestedTypes.Count)
-                throw new ArgumentException("Wrong size of requested types array.", "requestedTypes");
+                throw new ArgumentException("Wrong size of requested types array.", nameof(requestedTypes));
 
             int[] serverHandles = ArrayHelpers.GetServerHandles(items);
             IList<VarEnum> requestedDatatypes = requestedTypes.Select(TypeConverter.ToVarEnum).ToArray();
@@ -840,9 +817,15 @@ namespace TitaniumAS.Opc.Client.Da
         /// </summary>
         public void SyncState()
         {
-            int localeId;
-            As<OpcGroupStateMgt>().GetState(out _updateRate, out _isActive, out _name, out _timeBias,
-                out _percentDeadband, out localeId, out _clientHandle, out _serverHandle);
+            As<OpcGroupStateMgt>().GetState(
+                out _updateRate,
+                out _isActive,
+                out _name,
+                out _timeBias,
+                out _percentDeadband,
+                out int localeId,
+                out _clientHandle,
+                out _serverHandle);
             _culture = CultureHelper.GetCultureInfo(localeId);
 
             _keepAlive = RefreshKeepAlive();
@@ -899,12 +882,12 @@ namespace TitaniumAS.Opc.Client.Da
             try
             {
                 if (ComObject == null)
-                    return default(T);
-                return (T) Activator.CreateInstance(typeof (T), ComObject, Server);
+                    return default;
+                return (T)Activator.CreateInstance(typeof(T), ComObject, Server);
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -980,19 +963,19 @@ namespace TitaniumAS.Opc.Client.Da
                         throw ExceptionHelper.NotSupportedDa3x();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("feature", feature, null);
+                    throw new ArgumentOutOfRangeException(nameof(feature), feature, null);
             }
         }
 
         private void CheckItems(IList<OpcDaItem> items)
         {
             if (items == null)
-                throw new ArgumentNullException("items");
+                throw new ArgumentNullException(nameof(items));
 #if DEBUG
             foreach (OpcDaItem item in items)
             {
                 if (item == null)
-                    throw new ArgumentNullException("items");
+                    throw new ArgumentNullException(nameof(items));
                 if (item.Group != this && _items.Contains(item))
                     throw new ArgumentException(string.Format("Item '{0}' doesn't belong to the group '{1}'.",
                         item.ItemId, Name));
@@ -1040,7 +1023,7 @@ namespace TitaniumAS.Opc.Client.Da
         private HRESULT[] SetClientHandles(int[] serverHandles, int[] clientHandles)
         {
             if (serverHandles.Length != clientHandles.Length)
-                throw new ArgumentException("Wrong size of client handles array.", "clientHandles");
+                throw new ArgumentException("Wrong size of client handles array.", nameof(clientHandles));
             HRESULT[] ppErrors = As<OpcItemMgt>().SetClientHandles(serverHandles, clientHandles);
             return ppErrors;
         }
@@ -1112,8 +1095,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// <param name="e">The <see cref="OpcDaItemValuesChangedEventArgs" /> instance containing the event data.</param>
         protected virtual void OnValuesChanged(OpcDaItemValuesChangedEventArgs e)
         {
-            EventHandler<OpcDaItemValuesChangedEventArgs> handler = ValuesChanged;
-            if (handler != null) handler(this, e);
+            ValuesChanged?.Invoke(this, e);
         }
 
         /// <summary>
@@ -1121,8 +1103,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// </summary>
         protected virtual void OnDestroyed()
         {
-            EventHandler handler = Destroyed;
-            if (handler != null) handler(this, EventArgs.Empty);
+            Destroyed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -1131,8 +1112,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// <param name="e">The <see cref="OpcDaItemsChangedEventArgs" /> instance containing the event data.</param>
         protected virtual void OnItemsChanged(OpcDaItemsChangedEventArgs e)
         {
-            EventHandler<OpcDaItemsChangedEventArgs> handler = ItemsChanged;
-            if (handler != null) handler(this, e);
+            ItemsChanged?.Invoke(this, e);
         }
     }
 }

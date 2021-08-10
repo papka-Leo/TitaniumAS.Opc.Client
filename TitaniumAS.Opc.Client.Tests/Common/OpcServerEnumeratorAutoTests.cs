@@ -50,7 +50,7 @@ namespace TitaniumAS.Opc.Client.Tests.Common
             serverDescriptions.Should().ContainSingle(s => s.Uri.Segments[1] == "Matrikon.OPC.Simulation.1");
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void Test_Enumerate_Hosts()
         {
             var enumerator = new OpcServerEnumeratorAuto();

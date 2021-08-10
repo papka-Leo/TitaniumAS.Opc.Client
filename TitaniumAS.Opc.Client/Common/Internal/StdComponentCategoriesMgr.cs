@@ -6,11 +6,11 @@ using TitaniumAS.Opc.Client.Interop.Common;
 namespace TitaniumAS.Opc.Client.Common.Internal
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
-    internal struct CATEGORYINFO
+    internal readonly struct CATEGORYINFO
     {
-        public Guid catid;
-        public uint lcid;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string szDescription;
+        public readonly Guid catid;
+        public readonly uint lcid;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public readonly string szDescription;
     }
 
     [ComImport, Guid("0002E011-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown),

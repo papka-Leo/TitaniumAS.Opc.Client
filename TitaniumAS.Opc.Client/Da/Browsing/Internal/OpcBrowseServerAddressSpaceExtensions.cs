@@ -1,5 +1,4 @@
-﻿using System;
-using TitaniumAS.Opc.Client.Da.Wrappers;
+﻿using TitaniumAS.Opc.Client.Da.Wrappers;
 
 namespace TitaniumAS.Opc.Client.Da.Browsing.Internal
 {
@@ -11,7 +10,7 @@ namespace TitaniumAS.Opc.Client.Da.Browsing.Internal
             {
                 return opcBrowseServerAddressSpace.GetItemId(itemName);
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

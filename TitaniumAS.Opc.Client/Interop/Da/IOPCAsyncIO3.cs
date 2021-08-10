@@ -11,28 +11,27 @@ namespace TitaniumAS.Opc.Client.Interop.Da
     internal interface IOPCAsyncIO3 : IOPCAsyncIO2
     {
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Read(
+        new void Read(
             [In] int dwCount,
             [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
             [In] int dwTransactionID,
             out int pdwCancelID,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out
-                HRESULT[] ppErrors);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Write(
+        new void Write(
             [In] int dwCount,
             [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
             [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct), In] object[] pItemValues,
-            [In] int dwTransactionID, out int pdwCancelID,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out
-                HRESULT[] ppErrors);
+            [In] int dwTransactionID,
+            out int pdwCancelID,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Refresh2([In] OPCDATASOURCE dwSource, [In] int dwTransactionID, out int pdwCancelID);
+        new void Refresh2([In] OPCDATASOURCE dwSource, [In] int dwTransactionID, out int pdwCancelID);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Cancel2([In] int dwCancelID);
+        new void Cancel2([In] int dwCancelID);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void SetEnable([In] int bEnable);
@@ -41,17 +40,22 @@ namespace TitaniumAS.Opc.Client.Interop.Da
         void GetEnable(out int pbEnable);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void ReadMaxAge([In] int dwCount, [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
-            [MarshalAs(UnmanagedType.LPArray), In] int[] pdwMaxAge, [In] int dwTransactionID, out int pdwCancelID,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out
-                HRESULT[] ppErrors);
+        void ReadMaxAge(
+            [In] int dwCount,
+            [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
+            [MarshalAs(UnmanagedType.LPArray), In] int[] pdwMaxAge,
+            [In] int dwTransactionID,
+            out int pdwCancelID,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void WriteVQT([In] int dwCount, [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
+        void WriteVQT(
+            [In] int dwCount,
+            [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
             [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct), In] OPCITEMVQT[] pItemVQT,
-            [In] int dwTransactionID, out int pdwCancelID,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out
-                HRESULT[] ppErrors);
+            [In] int dwTransactionID,
+            out int pdwCancelID,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void RefreshMaxAge([In] int dwMaxAge, [In] int dwTransactionID, out int pdwCancelID);

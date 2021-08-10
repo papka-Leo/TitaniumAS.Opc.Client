@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Schedulers;
 using TitaniumAS.Opc.Client.Common;
 using TitaniumAS.Opc.Client.Da.Wrappers;
 
@@ -10,6 +11,8 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
 {
     internal class ReadAsyncRequest : IAsyncRequest
     {
+        private static readonly TaskScheduler Scheduler = new StaTaskScheduler(1);
+
         private readonly OpcAsyncIO2 _asyncIO2;
         private readonly TaskCompletionSource<OpcDaItemValue[]> _tcs = new TaskCompletionSource<OpcDaItemValue[]>();
         private AsyncRequestManager _requestManager;
@@ -21,10 +24,14 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
 
         public int CancellationId { get; private set; }
 
-        public Task<OpcDaItemValue[]> Task
-        {
-            get { return _tcs.Task; }
-        }
+        public Task<OpcDaItemValue[]> Task =>
+            _tcs.Task
+                .ContinueWith(
+                    antecedent => antecedent,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    Scheduler)
+                .Unwrap();
 
         public void OnReadComplete(int dwTransid, int hGroup, int hrMasterquality, int hrMastererror,
             OpcDaItemValue[] values)
@@ -68,9 +75,8 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
             try
             {
                 var serverHandles = ArrayHelpers.GetServerHandles(items);
-                
-                HRESULT[] ppErrors;
-                int cancelId = _asyncIO2.Read(serverHandles, TransactionId, out ppErrors);
+
+                int cancelId = _asyncIO2.Read(serverHandles, TransactionId, out HRESULT[] ppErrors);
 
                 if (ppErrors.All(e => e.Failed)) // if all errors no callback will take place
                 {
@@ -78,7 +84,7 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
                     var result = new OpcDaItemValue[ppErrors.Length];
                     for (var i = 0; i < result.Length; i++)
                     {
-                        result[i] = new OpcDaItemValue {Error = ppErrors[i], Item = items[i]};
+                        result[i] = new OpcDaItemValue { Error = ppErrors[i], Item = items[i] };
                     }
                     _tcs.SetResult(result);
                 }

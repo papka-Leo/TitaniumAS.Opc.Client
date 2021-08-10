@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Schedulers;
 using TitaniumAS.Opc.Client.Common;
 using TitaniumAS.Opc.Client.Da.Wrappers;
 
@@ -10,6 +11,8 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
 {
     internal class WriteAsyncRequest : IAsyncRequest
     {
+        private static readonly TaskScheduler Scheduler = new StaTaskScheduler(1);
+
         private readonly OpcAsyncIO2 _asyncIO2;
         private readonly TaskCompletionSource<HRESULT[]> _tcs = new TaskCompletionSource<HRESULT[]>();
         private AsyncRequestManager _requestManager;
@@ -21,10 +24,14 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
 
         public int CancellationId { get; private set; }
 
-        public Task<HRESULT[]> Task
-        {
-            get { return _tcs.Task; }
-        }
+        public Task<HRESULT[]> Task =>
+            _tcs.Task
+                .ContinueWith(
+                    antecedent => antecedent,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    Scheduler)
+                .Unwrap();
 
         public void OnReadComplete(int dwTransid, int hGroup, int hrMasterquality, int hrMastererror,
             OpcDaItemValue[] values)
@@ -69,9 +76,8 @@ namespace TitaniumAS.Opc.Client.Da.Internal.Requests
             try
             {
                 var serverHandles = ArrayHelpers.GetServerHandles(items);
-                
-                HRESULT[] ppErrors;
-                int cancelId =_asyncIO2.Write(serverHandles, values.ToArray(), TransactionId, out ppErrors);
+
+                int cancelId = _asyncIO2.Write(serverHandles, values.ToArray(), TransactionId, out HRESULT[] ppErrors);
 
                 if (ppErrors.All(e => e.Failed)) // if all errors no callback will take place
                 {

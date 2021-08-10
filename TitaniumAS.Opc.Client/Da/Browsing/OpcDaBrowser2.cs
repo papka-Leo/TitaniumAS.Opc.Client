@@ -16,7 +16,7 @@ namespace TitaniumAS.Opc.Client.Da.Browsing
     /// <seealso cref="TitaniumAS.Opc.Da.Browsing.IOpcDaBrowser" />
     public class OpcDaBrowser2 : IOpcDaBrowser
     {
-        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILog Log = LogManager.GetLogger<OpcDaBrowser2>();
         private OpcDaServer _opcDaServer;
         protected OpcBrowseServerAddressSpace OpcBrowseServerAddressSpace { get; set; }
         private OpcItemProperties OpcItemProperties { get; set; }
@@ -158,30 +158,42 @@ namespace TitaniumAS.Opc.Client.Da.Browsing
                     switch (filter.ElementType)
                     {
                         case OpcDaBrowseFilter.All:
-                            var branches = OpcBrowseServerAddressSpace.BrowseOpcItemIds(OpcDaBrowseType.Branch,
-                                filter.Name, dataTypeFilter,
-                                filter.AccessRights)
+                            var branches = OpcBrowseServerAddressSpace
+                                .BrowseOpcItemIds(
+                                    OpcDaBrowseType.Branch,
+                                    filter.Name,
+                                    dataTypeFilter,
+                                    filter.AccessRights)
                                 .Select(CreateBranchBrowseElement);
-                            var leafs = OpcBrowseServerAddressSpace.BrowseOpcItemIds(OpcDaBrowseType.Leaf, filter.Name,
-                                dataTypeFilter,
-                                filter.AccessRights)
+                            var leafs = OpcBrowseServerAddressSpace
+                                .BrowseOpcItemIds(
+                                    OpcDaBrowseType.Leaf,
+                                    filter.Name,
+                                    dataTypeFilter,
+                                    filter.AccessRights)
                                 .Select(CreateLeafBrowseElement);
                             elements = branches.Union(leafs);
                             break;
                         case OpcDaBrowseFilter.Branches:
-                            elements = OpcBrowseServerAddressSpace.BrowseOpcItemIds(OpcDaBrowseType.Branch, filter.Name,
-                                dataTypeFilter,
-                                filter.AccessRights)
+                            elements = OpcBrowseServerAddressSpace
+                                .BrowseOpcItemIds(
+                                    OpcDaBrowseType.Branch,
+                                    filter.Name,
+                                    dataTypeFilter,
+                                    filter.AccessRights)
                                 .Select(CreateBranchBrowseElement);
                             break;
                         case OpcDaBrowseFilter.Items:
-                            elements = OpcBrowseServerAddressSpace.BrowseOpcItemIds(OpcDaBrowseType.Leaf, filter.Name,
-                                dataTypeFilter,
-                                filter.AccessRights)
+                            elements = OpcBrowseServerAddressSpace
+                                .BrowseOpcItemIds(
+                                    OpcDaBrowseType.Leaf,
+                                    filter.Name,
+                                    dataTypeFilter,
+                                    filter.AccessRights)
                                 .Select(CreateLeafBrowseElement);
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            throw new ArgumentOutOfRangeException(nameof(filter.ElementType), "Unknown filter type");
                     }
                     break;
                 case OpcDaNamespaceType.Flat:
@@ -191,14 +203,17 @@ namespace TitaniumAS.Opc.Client.Da.Browsing
                     }
                     else
                     {
-                        elements = OpcBrowseServerAddressSpace.BrowseOpcItemIds(OpcDaBrowseType.Flat, filter.Name,
-                            dataTypeFilter,
-                            filter.AccessRights)
+                        elements = OpcBrowseServerAddressSpace
+                            .BrowseOpcItemIds(
+                                OpcDaBrowseType.Flat,
+                                filter.Name,
+                                dataTypeFilter,
+                                filter.AccessRights)
                             .Select(CreateLeafBrowseElement);
                     }
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidOperationException("Unknown namespace type");
             }
             return elements.ToArray();
         }

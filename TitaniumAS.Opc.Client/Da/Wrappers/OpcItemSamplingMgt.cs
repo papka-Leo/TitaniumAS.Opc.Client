@@ -1,6 +1,5 @@
 ﻿using System;
 using TitaniumAS.Opc.Client.Common;
-using TitaniumAS.Opc.Client.Da.Internal;
 using TitaniumAS.Opc.Client.Interop.Da;
 using TitaniumAS.Opc.Client.Interop.System;
 
@@ -10,8 +9,14 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
     {
         public OpcItemSamplingMgt(object comObject, object userData) : base(userData)
         {
-            if (comObject == null) throw new ArgumentNullException("comObject");
-            ComObject = DoComCall(comObject, "IUnknown::QueryInterface<IOPCItemSamplingMgt>",
+            if (comObject == null)
+            {
+                throw new ArgumentNullException(nameof(comObject));
+            }
+
+            ComObject = DoComCall(
+                comObject,
+                "IUnknown::QueryInterface<IOPCItemSamplingMgt>",
                 () => comObject.QueryInterface<IOPCItemSamplingMgt>());
         }
 
@@ -23,13 +28,13 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
             out HRESULT[] errors)
         {
             throw new NotImplementedException();
-            int[] pdwRequestedSamplingRate = ArrayHelpers.CreateMaxAgeArray(requestedSamplingRate,
-                requestedSamplingRate.Length);
-            IntPtr ppdwRevisedSamplingRate;
-            IntPtr ppErrors;
-            ComObject.SetItemSamplingRate(serverHandles.Length, serverHandles, pdwRequestedSamplingRate,
-                out ppdwRevisedSamplingRate, out ppErrors);
-            return null;
+            //int[] pdwRequestedSamplingRate = ArrayHelpers.CreateMaxAgeArray(requestedSamplingRate,
+            //    requestedSamplingRate.Length);
+            //IntPtr ppdwRevisedSamplingRate;
+            //IntPtr ppErrors;
+            //ComObject.SetItemSamplingRate(serverHandles.Length, serverHandles, pdwRequestedSamplingRate,
+            //    out ppdwRevisedSamplingRate, out ppErrors);
+            //return null;
         }
 
         public TimeSpan[] GetItemSamplingRate(

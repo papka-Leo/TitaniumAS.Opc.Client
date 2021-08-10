@@ -36,13 +36,18 @@ namespace TitaniumAS.Opc.Client.Interop.System
             uint dwClsContext,
             [In] ref COSERVERINFO pServerInfo,
             [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-            [MarshalAs(UnmanagedType.IUnknown)] [Out] out object ppv);
+            [MarshalAs(UnmanagedType.IUnknown)][Out] out object ppv);
 
         [DllImport("ole32.dll")]
         private static extern int CoSetProxyBlanket(
-            [MarshalAs(UnmanagedType.IUnknown)] object pProxy, uint dwAuthnSvc, uint dwAuthzSvc,
-            [MarshalAs(UnmanagedType.LPWStr)] string pServerPrincName, uint dwAuthnLevel,
-            uint dwImpLevel, IntPtr pAuthInfo, uint dwCapabilities);
+            [MarshalAs(UnmanagedType.IUnknown)] object pProxy,
+            uint dwAuthnSvc,
+            uint dwAuthzSvc,
+            [MarshalAs(UnmanagedType.LPWStr)] string pServerPrincName,
+            uint dwAuthnLevel,
+            uint dwImpLevel,
+            IntPtr pAuthInfo,
+            uint dwCapabilities);
 
         /// <summary>
         /// Initializes COM security.
@@ -71,10 +76,15 @@ namespace TitaniumAS.Opc.Client.Interop.System
             if (comProxyBlanket != null)
             {
                 var result =
-                    new HRESULT(CoSetProxyBlanket(comObject, (uint) comProxyBlanket.RpcAuthService,
-                        (uint) comProxyBlanket.RpcAuthType,
-                        null, (uint) comProxyBlanket.RpcAuthnLevel, (uint) comProxyBlanket.RpcImpLevel, IntPtr.Zero,
-                        (uint) comProxyBlanket.DwCapabilities));
+                    new HRESULT(CoSetProxyBlanket(
+                        comObject,
+                        (uint)comProxyBlanket.RpcAuthService,
+                        (uint)comProxyBlanket.RpcAuthType,
+                        null,
+                        (uint)comProxyBlanket.RpcAuthnLevel,
+                        (uint)comProxyBlanket.RpcImpLevel,
+                        IntPtr.Zero,
+                        (uint)comProxyBlanket.DwCapabilities));
                 if (result.Failed)
                 {
                     throw HRESULT.GetExceptionForHR(result);
@@ -124,7 +134,7 @@ namespace TitaniumAS.Opc.Client.Interop.System
                 serverInfo.Deallocate();
             }
 
-            int error = (int) results[0].hr;
+            int error = (int)results[0].hr;
             if (error != 0)
             {
                 throw new ExternalException("CoCreateInstanceEx: " + GetSystemMessage(error), error);
@@ -136,7 +146,10 @@ namespace TitaniumAS.Opc.Client.Interop.System
         /// <summary>
         /// Creates an instance of a COM server and call CoSetProxyBlanket.
         /// </summary>
-        public static object CreateInstanceWithBlanket(Guid clsid, string host, NetworkCredential credential,
+        public static object CreateInstanceWithBlanket(
+            Guid clsid,
+            string host,
+            NetworkCredential credential,
             ComProxyBlanket comProxyBlanket = null)
         {
             object obj = CreateInstance(clsid, host, credential);
@@ -147,8 +160,12 @@ namespace TitaniumAS.Opc.Client.Interop.System
         /// <summary>
         /// Creates an instance of a COM server using the specified license key and call CoSetProxyBlanket.
         /// </summary>
-        public static object CreateInstanceWithLicenseKeyAndBlanket(Guid clsid, string host,
-            NetworkCredential credential, string licenseKey, ComProxyBlanket comProxyBlanket = null)
+        public static object CreateInstanceWithLicenseKeyAndBlanket(
+            Guid clsid,
+            string host,
+            NetworkCredential credential,
+            string licenseKey,
+            ComProxyBlanket comProxyBlanket = null)
         {
             object obj = CreateInstanceWithLicenseKey(clsid, host, credential, licenseKey);
             SetProxyBlanket(obj, comProxyBlanket);
@@ -163,8 +180,6 @@ namespace TitaniumAS.Opc.Client.Interop.System
             var serverInfo = new ServerInfo();
             COSERVERINFO coserverInfo = serverInfo.Allocate(hostName, credential);
             object instance = null;
-            IClassFactory2 factory = null;
-
             try
             {
                 // Check whether connecting locally or remotely.
@@ -176,19 +191,18 @@ namespace TitaniumAS.Opc.Client.Interop.System
                 }
 
                 // Get the class factory.
-                object unknown = null;
 
                 CoGetClassObject(
                     clsid,
                     clsctx,
                     ref coserverInfo,
-                    typeof (IClassFactory2).GUID,
-                    out unknown);
+                    typeof(IClassFactory2).GUID,
+                    out object unknown);
 
-                factory = (IClassFactory2) unknown;
+                IClassFactory2 factory = (IClassFactory2)unknown;
 
                 // Set the proper connect authentication level
-                var security = (IClientSecurity) factory;
+                var security = (IClientSecurity)factory;
 
                 uint pAuthnSvc = 0;
                 uint pAuthzSvc = 0;
@@ -231,9 +245,9 @@ namespace TitaniumAS.Opc.Client.Interop.System
                     licenseKey,
                     out instance);
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -274,9 +288,8 @@ namespace TitaniumAS.Opc.Client.Interop.System
             const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
 
             IntPtr buffer = Marshal.AllocCoTaskMem(MAX_MESSAGE_LENGTH);
-
-            int result = FormatMessageW(
-                (int) (FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM),
+            _ = FormatMessageW(
+                (int)(FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM),
                 IntPtr.Zero,
                 error,
                 0,
@@ -297,7 +310,7 @@ namespace TitaniumAS.Opc.Client.Interop.System
 
         public static T QueryInterface<T>(this object comServer) where T : class
         {
-            return (T) comServer;
+            return (T)comServer;
         }
 
         public static T TryQueryInterface<T>(this object comServer) where T : class

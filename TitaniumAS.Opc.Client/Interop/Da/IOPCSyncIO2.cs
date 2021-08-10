@@ -11,33 +11,35 @@ namespace TitaniumAS.Opc.Client.Interop.Da
     internal interface IOPCSyncIO2 : IOPCSyncIO
     {
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Read(
+        new void Read(
             [In] OPCDATASOURCE dwSource,
             [In] int dwCount,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1), In] int[] phServer,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out
-                OPCITEMSTATE[] ppItemValues,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out
-                HRESULT[] ppErrors);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out OPCITEMSTATE[] ppItemValues,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void Write(
+        new void Write(
             [In] int dwCount,
             [MarshalAs(UnmanagedType.LPArray), In] int[] phServer,
             [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct), In] object[] pItemValues,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out
-                HRESULT[] ppErrors);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void ReadMaxAge([In] int dwCount, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), In] int[] phServer, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), In] int[] pdwMaxAge, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out object[] ppvValues, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), Out] out short[] ppwQualities, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out FILETIME[] ppftTimeStamps, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
+        void ReadMaxAge(
+            [In] int dwCount,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), In] int[] phServer,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), In] int[] pdwMaxAge,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out object[] ppvValues,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), Out] out short[] ppwQualities,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out FILETIME[] ppftTimeStamps,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void WriteVQT(
             [In] int dwCount,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0), In] int[] phServer,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), In] OPCITEMVQT[]
-                pItemVQT,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out
-                HRESULT[] ppErrors);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), In] OPCITEMVQT[] pItemVQT,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0), Out] out HRESULT[] ppErrors);
     }
 }

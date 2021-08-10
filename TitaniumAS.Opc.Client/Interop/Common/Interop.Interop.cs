@@ -54,18 +54,13 @@ namespace TitaniumAS.Opc.Client.Interop.Common
         /// </summary>
         public static string[] GetNetworkComputers()
         {
-            IntPtr pInfo;
-
-            var entriesRead = 0;
-            var totalEntries = 0;
-
             var result = NetServerEnum(
                 IntPtr.Zero,
                 LEVEL_SERVER_INFO_100,
-                out pInfo,
+                out IntPtr pInfo,
                 MAX_PREFERRED_LENGTH,
-                out entriesRead,
-                out totalEntries,
+                out int entriesRead,
+                out _,
                 SV_TYPE_WORKSTATION | SV_TYPE_SERVER,
                 IntPtr.Zero,
                 IntPtr.Zero);
@@ -81,14 +76,14 @@ namespace TitaniumAS.Opc.Client.Interop.Common
 
             for (var ii = 0; ii < entriesRead; ii++)
             {
-                var info = (SERVER_INFO_100) Marshal.PtrToStructure(pos, typeof (SERVER_INFO_100));
+                var info = (SERVER_INFO_100)Marshal.PtrToStructure(pos, typeof(SERVER_INFO_100));
 
                 computers[ii] = info.sv100_name;
 
-                pos = (IntPtr) (pos.ToInt32() + Marshal.SizeOf(typeof (SERVER_INFO_100)));
+                pos = (IntPtr)(pos.ToInt32() + Marshal.SizeOf(typeof(SERVER_INFO_100)));
             }
 
-            NetApiBufferFree(pInfo);
+            _ = NetApiBufferFree(pInfo);
 
             return computers;
         }
@@ -104,7 +99,7 @@ namespace TitaniumAS.Opc.Client.Interop.Common
             string name = null;
             var size = MAX_COMPUTERNAME_LENGTH + 1;
 
-            var pName = Marshal.AllocCoTaskMem(size*2);
+            var pName = Marshal.AllocCoTaskMem(size * 2);
 
             if (GetComputerNameW(pName, ref size) != 0)
             {
@@ -117,9 +112,16 @@ namespace TitaniumAS.Opc.Client.Interop.Common
         }
 
         [DllImport("ole32.dll")]
-        private static extern int CoInitializeSecurity(IntPtr pSecDesc, int cAuthSvc,
-            SOLE_AUTHENTICATION_SERVICE[] asAuthSvc, IntPtr pReserved1, uint dwAuthnLevel, uint dwImpLevel,
-            IntPtr pAuthList, uint dwCapabilities, IntPtr pReserved3);
+        private static extern int CoInitializeSecurity(
+            IntPtr pSecDesc,
+            int cAuthSvc,
+            SOLE_AUTHENTICATION_SERVICE[] asAuthSvc,
+            IntPtr pReserved1,
+            uint dwAuthnLevel,
+            uint dwImpLevel,
+            IntPtr pAuthList,
+            uint dwCapabilities,
+            IntPtr pReserved3);
 
         public static void InitializeSecurity()
         {
@@ -131,22 +133,22 @@ namespace TitaniumAS.Opc.Client.Interop.Common
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        private struct SERVER_INFO_100
+        private readonly struct SERVER_INFO_100
         {
             public readonly uint sv100_platform_id;
             [MarshalAs(UnmanagedType.LPWStr)] public readonly string sv100_name;
         }
 
-        private struct SOLE_AUTHENTICATION_SERVICE
+        private readonly struct SOLE_AUTHENTICATION_SERVICE
         {
-            public int dwAuthnSvc;
-            public int dwAuthzSvc;
-            public int hr;
-            [MarshalAs(UnmanagedType.BStr)] public string pPrincipalName;
+            public readonly int dwAuthnSvc;
+            public readonly int dwAuthzSvc;
+            public readonly int hr;
+            [MarshalAs(UnmanagedType.BStr)] public readonly string pPrincipalName;
         }
 
         [DllImport("ole32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
-        public static extern string ProgIDFromCLSID([In()] ref Guid clsid);
+        private static extern string ProgIDFromCLSID([In()] ref Guid clsid);
 
         [DllImport("ole32.dll")]
         internal static extern int CLSIDFromProgID([MarshalAs(UnmanagedType.LPWStr)] string lpszProgID, out Guid pclsid);

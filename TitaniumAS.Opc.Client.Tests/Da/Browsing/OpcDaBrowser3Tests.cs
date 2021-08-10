@@ -9,8 +9,8 @@ namespace TitaniumAS.Opc.Client.Tests.Da.Browsing
     [TestClass]
     public class OpcDaBrowser3Tests
     {
-        private OpcDaServer _graybox;
-        private OpcDaBrowser3 _grayboxBrowser;
+        //private OpcDaServer _graybox;
+        //private OpcDaBrowser3 _grayboxBrowser;
         private OpcDaServer _matrikon;
         private OpcDaBrowser3 _matrikonBrowser;
 
@@ -19,16 +19,16 @@ namespace TitaniumAS.Opc.Client.Tests.Da.Browsing
         {
             _matrikon = new OpcDaServer(UrlBuilder.Build("Matrikon.OPC.Simulation.1"));
             _matrikon.Connect();
-            _graybox = new OpcDaServer(UrlBuilder.Build("Graybox.Simulator.1"));
-            _graybox.Connect();
+            //_graybox = new OpcDaServer(UrlBuilder.Build("Graybox.Simulator.1"));
+            //_graybox.Connect();
             _matrikonBrowser = new OpcDaBrowser3(_matrikon);
-            _grayboxBrowser = new OpcDaBrowser3(_graybox);
+            //_grayboxBrowser = new OpcDaBrowser3(_graybox);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            _graybox.Dispose();
+            //_graybox.Dispose();
             _matrikon.Dispose();
         }
 
@@ -84,51 +84,51 @@ namespace TitaniumAS.Opc.Client.Tests.Da.Browsing
             }
         }
 
-        [TestMethod]
-        public void Test_Browser_GetProperties_All()
-        {
-            var properties = _grayboxBrowser.GetProperties(
-                new[] {"numeric.random.int32", "numeric.random.int16"},
-                new OpcDaPropertiesQuery(true));
-            foreach (var itemProperties in properties)
-            {
-                itemProperties.ErrorId.Should().Match<HRESULT>(e => e.Succeeded);
-                itemProperties.Properties.Should().NotBeEmpty().And.OnlyContain(p => p.Value != null);
-            }
-        }
+        //[TestMethod]
+        //public void Test_Browser_GetProperties_All()
+        //{
+        //    var properties = _grayboxBrowser.GetProperties(
+        //        new[] {"numeric.random.int32", "numeric.random.int16"},
+        //        new OpcDaPropertiesQuery(true));
+        //    foreach (var itemProperties in properties)
+        //    {
+        //        itemProperties.ErrorId.Should().Match<HRESULT>(e => e.Succeeded);
+        //        itemProperties.Properties.Should().NotBeEmpty().And.OnlyContain(p => p.Value != null);
+        //    }
+        //}
 
-        [TestMethod]
-        public void Test_Browser_GetProperties_NoValue()
-        {
-            var properties = _grayboxBrowser.GetProperties(new[] {"numeric.random.int32", "numeric.random.int16"},
-                new OpcDaPropertiesQuery(false));
-            foreach (var itemProperties in properties)
-            {
-                itemProperties.Properties.Should().NotBeEmpty().And.OnlyContain(p => p.Value == null);
-            }
-        }
+        //[TestMethod]
+        //public void Test_Browser_GetProperties_NoValue()
+        //{
+        //    var properties = _grayboxBrowser.GetProperties(new[] {"numeric.random.int32", "numeric.random.int16"},
+        //        new OpcDaPropertiesQuery(false));
+        //    foreach (var itemProperties in properties)
+        //    {
+        //        itemProperties.Properties.Should().NotBeEmpty().And.OnlyContain(p => p.Value == null);
+        //    }
+        //}
 
-        [TestMethod]
-        public void Test_Browser_GetElements_WithProperties()
-        {
-            var elements = _grayboxBrowser.GetElements("numeric.random", null, new OpcDaPropertiesQuery());
-            foreach (var element in elements)
-            {
-                element.ItemProperties.Should().Match<OpcDaItemProperties>(p => p.Properties.Length > 0);
-            }
-        }
+        //[TestMethod]
+        //public void Test_Browser_GetElements_WithProperties()
+        //{
+        //    var elements = _grayboxBrowser.GetElements("numeric.random", null, new OpcDaPropertiesQuery());
+        //    foreach (var element in elements)
+        //    {
+        //        element.ItemProperties.Should().Match<OpcDaItemProperties>(p => p.Properties.Length > 0);
+        //    }
+        //}
 
-        [TestMethod]
-        public void Test_Browser_TraverseTree_Graybox()
-        {
-            BrowseHelpers.BrowseChildren("", _grayboxBrowser);
-        }
+        //[TestMethod]
+        //public void Test_Browser_TraverseTree_Graybox()
+        //{
+        //    BrowseHelpers.BrowseChildren("", _grayboxBrowser);
+        //}
 
-        [TestMethod]
-        public void Test_GetProperties()
-        {
-            var properties = _grayboxBrowser.GetProperties(new[] {"numeric.random.int32"});
-            properties[0].Properties.Should().NotBeEmpty();
-        }
+        //[TestMethod]
+        //public void Test_GetProperties()
+        //{
+        //    var properties = _grayboxBrowser.GetProperties(new[] {"numeric.random.int32"});
+        //    properties[0].Properties.Should().NotBeEmpty();
+        //}
     }
 }

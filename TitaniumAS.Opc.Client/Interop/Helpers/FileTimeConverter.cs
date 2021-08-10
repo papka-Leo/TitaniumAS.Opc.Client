@@ -7,7 +7,7 @@ namespace TitaniumAS.Opc.Client.Interop.Helpers
     {
         public static DateTimeOffset FromFileTime(FILETIME fileTime)
         {
-            var lft = (((long) fileTime.dwHighDateTime) << 32) + fileTime.dwLowDateTime;
+            var lft = (((long)fileTime.dwHighDateTime) << 32) + (uint)fileTime.dwLowDateTime;
             return DateTimeOffset.FromFileTime(lft);
         }
 
@@ -15,8 +15,8 @@ namespace TitaniumAS.Opc.Client.Interop.Helpers
         {
             var lft = fileTime.ToFileTime();
             FILETIME ft;
-            ft.dwLowDateTime = (int) (lft & 0xFFFFFFFF);
-            ft.dwHighDateTime = (int) (lft >> 32);
+            ft.dwLowDateTime = (int)(lft & 0xFFFFFFFF);
+            ft.dwHighDateTime = (int)(lft >> 32);
             return ft;
         }
     }

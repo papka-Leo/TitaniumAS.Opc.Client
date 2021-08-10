@@ -7,17 +7,27 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
 {
     internal class OpcGroupStateMgt : ComWrapper
     {
-        public OpcGroupStateMgt(object comObject, object userData):base(userData)
+        public OpcGroupStateMgt(object comObject, object userData)
+            : base(userData)
         {
-            if (comObject == null) throw new ArgumentNullException("comObject");
-            ComObject = DoComCall(comObject, "IUnknown::QueryInterface<IOPCGroupStateMgt>",
+            if (comObject == null) throw new ArgumentNullException(nameof(comObject));
+            ComObject = DoComCall(
+                comObject,
+                "IUnknown::QueryInterface<IOPCGroupStateMgt>",
                 () => comObject.QueryInterface<IOPCGroupStateMgt>());
         }
 
         internal IOPCGroupStateMgt ComObject { get; set; }
 
-        public void GetState(out TimeSpan updateRate, out bool active, out string name, out TimeSpan timeBias,
-            out float percentDeadband, out int lcid, out int clientHandle, out int serverHandle)
+        public void GetState(
+            out TimeSpan updateRate,
+            out bool active,
+            out string name,
+            out TimeSpan timeBias,
+            out float percentDeadband,
+            out int lcid,
+            out int clientHandle,
+            out int serverHandle)
         {
             bool _active = false;
             string _name = string.Empty;
@@ -27,16 +37,24 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
             int _serverHandle = 0;
             var _updateRate = new TimeSpan();
             var _timeBias = new TimeSpan();
-            DoComCall(ComObject, "IOPCGroupStateMgt::GetState", () =>
-            {
-                int pUpdateRate;
-                int pTimeBias;
-                ComObject.GetState(out pUpdateRate, out _active, out _name, out pTimeBias, out _percentDeadband,
-                    out _lcid, out _clientHandle, out _serverHandle);
+            DoComCall(
+                ComObject,
+                "IOPCGroupStateMgt::GetState",
+                () =>
+                {
+                    ComObject.GetState(
+                        out int pUpdateRate,
+                        out _active,
+                        out _name,
+                        out int pTimeBias,
+                        out _percentDeadband,
+                        out _lcid,
+                        out _clientHandle,
+                        out _serverHandle);
 
-                _updateRate = TimeSpan.FromMilliseconds(pUpdateRate);
-                _timeBias = TimeSpan.FromMinutes(pTimeBias);
-            });
+                    _updateRate = TimeSpan.FromMilliseconds(pUpdateRate);
+                    _timeBias = TimeSpan.FromMinutes(pTimeBias);
+                });
             active = _active;
             name = _name;
             percentDeadband = _percentDeadband;
@@ -58,37 +76,56 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
             int[] pRequestedUpdateRate = null;
             if (requestedUpdateRate.HasValue)
             {
-                pRequestedUpdateRate = new[] {(int) requestedUpdateRate.Value.TotalMilliseconds};
+                pRequestedUpdateRate = new[] { (int)requestedUpdateRate.Value.TotalMilliseconds };
             }
+
             bool[] pActive = null;
             if (active.HasValue)
             {
-                pActive = new[] {active.Value};
+                pActive = new[] { active.Value };
             }
+
             int[] pTimeBias = null;
             if (timeBias.HasValue)
             {
-                pTimeBias = new[] {(int) timeBias.Value.TotalMinutes};
+                pTimeBias = new[] { (int)timeBias.Value.TotalMinutes };
             }
+
             float[] pPercentDeadband = null;
             if (percentDeadband.HasValue)
             {
-                pPercentDeadband = new[] {percentDeadband.Value};
+                pPercentDeadband = new[] { percentDeadband.Value };
             }
+
             int[] pLCID = null;
             if (LCID.HasValue)
             {
-                pLCID = new[] {LCID.Value};
+                pLCID = new[] { LCID.Value };
             }
+
             int[] phClientGroup = null;
             if (clientHandle.HasValue)
             {
-                phClientGroup = new[] {clientHandle.Value};
+                phClientGroup = new[] { clientHandle.Value };
             }
-            DoComCall(ComObject, "IOPCGroupStateMgt::SetState", () =>
-                ComObject.SetState(pRequestedUpdateRate, out pRevisedUpdateRate, pActive, pTimeBias, pPercentDeadband,
-                    pLCID, phClientGroup),
-                pRequestedUpdateRate, pActive, pTimeBias, pPercentDeadband, pLCID);
+
+            DoComCall(
+                ComObject,
+                "IOPCGroupStateMgt::SetState",
+                () =>
+                ComObject.SetState(
+                    pRequestedUpdateRate,
+                    out pRevisedUpdateRate,
+                    pActive,
+                    pTimeBias,
+                    pPercentDeadband,
+                    pLCID,
+                    phClientGroup),
+                pRequestedUpdateRate,
+                pActive,
+                pTimeBias,
+                pPercentDeadband,
+                pLCID);
             return TimeSpan.FromMilliseconds(pRevisedUpdateRate);
         }
 
@@ -99,13 +136,16 @@ namespace TitaniumAS.Opc.Client.Da.Wrappers
 
         public object CloneGroup(string name)
         {
-            return DoComCall(ComObject, "IOPCGroupStateMgt::CloneGroup", () =>
-            {
-                object ppUnk;
-                Guid riid = Com.IUnknownIID;
-                ComObject.CloneGroup(name, ref riid, out ppUnk);
-                return ppUnk;
-            }, name);
+            return DoComCall(
+                ComObject,
+                "IOPCGroupStateMgt::CloneGroup",
+                () =>
+                {
+                    Guid riid = Com.IUnknownIID;
+                    ComObject.CloneGroup(name, ref riid, out object ppUnk);
+                    return ppUnk;
+                },
+                name);
         }
     }
 }

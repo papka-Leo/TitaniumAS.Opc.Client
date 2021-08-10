@@ -133,7 +133,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
         public void Test_Clone_With_Items()
         {
             var g1 = _server.AddGroup("g1");
-            g1.AddItems(new[] {new OpcDaItemDefinition {ItemId = "Random.Int2"}});
+            g1.AddItems(new[] { new OpcDaItemDefinition { ItemId = "Random.Int2" } });
 
             var g2 = g1.Clone("g2");
             g2.Items.Should().HaveCount(1);
@@ -321,7 +321,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             var itemResult = g1.AddItems(items);
             g1.IsActive = true;
 
-            var errors = g1.Write(g1.Items, new object[] {1, 2.0});
+            var errors = g1.Write(g1.Items, new object[] { 1, 2.0 });
             errors.Should().HaveCount(2);
             errors.Should().OnlyContain(e => e.Succeeded);
         }
@@ -351,7 +351,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             };
             var itemResult = g1.AddItems(items);
             g1.IsActive = true;
-            var values = g1.ReadMaxAge(g1.Items, new[] {TimeSpan.Zero, TimeSpan.MaxValue, TimeSpan.FromSeconds(5)});
+            var values = g1.ReadMaxAge(g1.Items, new[] { TimeSpan.Zero, TimeSpan.MaxValue, TimeSpan.FromSeconds(5) });
             values.Should().HaveCount(3);
             values.Should().OnlyContain(v => v.Error.Succeeded);
         }
@@ -446,7 +446,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             var task = g1.ReadAsync(g1.Items, cts.Token);
 
             Action act = () => task.Wait();
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -499,7 +499,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             var task = g1.RefreshAsync(OpcDaDataSource.Device, cts.Token);
 
             Action act = () => task.Wait();
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -524,7 +524,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             g1.IsActive = true;
 
             var cts = new CancellationTokenSource();
-            var task = g1.WriteAsync(g1.Items, new object[] {1, 2.0}, cts.Token);
+            var task = g1.WriteAsync(g1.Items, new object[] { 1, 2.0 }, cts.Token);
             task.Wait();
             var errors = task.Result;
             errors.Should().HaveCount(2);
@@ -547,9 +547,9 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             g1.IsActive = true;
 
             var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1));
-            var task = g1.WriteAsync(g1.Items, new object[] {1, 2.0}, cts.Token);
+            var task = g1.WriteAsync(g1.Items, new object[] { 1, 2.0 }, cts.Token);
             Action act = () => task.Wait();
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -574,7 +574,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             g1.IsActive = true;
 
             var cts = new CancellationTokenSource();
-            var task = g1.ReadMaxAgeAsync(g1.Items, new[] {TimeSpan.Zero, TimeSpan.Zero}, cts.Token);
+            var task = g1.ReadMaxAgeAsync(g1.Items, new[] { TimeSpan.Zero, TimeSpan.Zero }, cts.Token);
             task.Wait();
             var values = task.Result;
             values.Should().HaveCount(2);
@@ -599,7 +599,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             cts.Cancel();
             var task = g1.ReadMaxAgeAsync(g1.Items, null, cts.Token);
             Action act = task.Wait;
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -632,7 +632,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             values.Should().OnlyContain(v => v.Quality.Master == OpcDaQualityMaster.Good);
         }
 
-        [TestMethod , Ignore]
+        [TestMethod, Ignore]
         public void Test_RefreshMaxAgeAsync_Cancellation()
         {
             var g1 = _server.AddGroup("g1");
@@ -652,7 +652,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             var task = g1.RefreshMaxAgeAsync(TimeSpan.Zero, cts.Token);
 
             Action act = task.Wait;
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -727,7 +727,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             cts.Cancel();
             var task = g1.WriteVQTAsync(g1.Items, opcItemValues, cts.Token);
             Action act = task.Wait;
-            act.ShouldThrow<AggregateException>();
+            act.Should().Throw<AggregateException>();
         }
 
         [TestMethod]
@@ -749,10 +749,10 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             };
             g1.UpdateRate = TimeSpan.FromMilliseconds(500);
             g1.IsSubscribed = true;
-            
+
             var values = new List<OpcDaItemValue>();
             AutoResetEvent callbackCalled = new AutoResetEvent(false);
-            g1.ValuesChanged += delegate(object sender, OpcDaItemValuesChangedEventArgs args)
+            g1.ValuesChanged += delegate (object sender, OpcDaItemValuesChangedEventArgs args)
             {
                 values.InsertRange(values.Count, args.Values);
                 callbackCalled.Set();
@@ -763,7 +763,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             var v2 = g1.Items[1];
 
             // 1st active
-            g1.SetActiveItems(new []{v1});
+            g1.SetActiveItems(new[] { v1 });
             g1.IsActive = true;
 
             callbackCalled.WaitOne(TimeSpan.FromSeconds(5));
@@ -771,8 +771,8 @@ namespace TitaniumAS.Opc.Client.Tests.Da
             values.Should().OnlyContain(v => v.Item == v1).And.NotBeEmpty();
 
             // 2nd active
-            g1.SetActiveItems(new []{v1}, false);
-            g1.SetActiveItems(new []{v2}, true);
+            g1.SetActiveItems(new[] { v1 }, false);
+            g1.SetActiveItems(new[] { v2 }, true);
             values.Clear();
             g1.IsActive = true;
 
@@ -816,7 +816,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
                 group.UpdateRate = TimeSpan.FromMilliseconds(10);
                 group.IsSubscribed = true;
                 CancellationTokenSource cts = new CancellationTokenSource();
-                
+
                 List<Task> tasks = new List<Task>();
                 for (var i = 0; i < 100; i++)
                 {
@@ -876,7 +876,7 @@ namespace TitaniumAS.Opc.Client.Tests.Da
                         group.RefreshAsync(OpcDaDataSource.Cache, cts.Token)
                         );
 
-                    group.RemoveItems(group.Items.Take(group.Items.Count/2).ToArray());
+                    group.RemoveItems(group.Items.Take(group.Items.Count / 2).ToArray());
 
                     // sync read
                     group.Read(group.Items);

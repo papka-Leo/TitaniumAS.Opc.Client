@@ -597,14 +597,12 @@ namespace TitaniumAS.Opc.Client.Da
 
         protected virtual void OnConnectionStateChanged(bool isConnected)
         {
-            EventHandler<OpcDaServerConnectionStateChangedEventArgs> handler = ConnectionStateChanged;
-            if (handler != null) handler(this, new OpcDaServerConnectionStateChangedEventArgs(isConnected));
+            ConnectionStateChanged?.Invoke(this, new OpcDaServerConnectionStateChangedEventArgs(isConnected));
         }
 
         protected virtual void OnGroupsChanged(OpcDaServerGroupsChangedEventArgs e)
         {
-            EventHandler<OpcDaServerGroupsChangedEventArgs> handler = GroupsChanged;
-            if (handler != null) handler(this, e);
+            GroupsChanged?.Invoke(this, e);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace TitaniumAS.Opc.Client.Common.Internal
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Failed to connect to '{0}' connection point.", ex, typeof (T).Name);
+                Log.ErrorFormat("Failed to connect to '{0}' connection point.", ex, typeof(T).Name);
             }
         }
 
@@ -62,12 +62,11 @@ namespace TitaniumAS.Opc.Client.Common.Internal
             if (IsConnected)
                 throw new InvalidOperationException("Already attached to the connection point.");
 
-            var connectionPointContainer = (IConnectionPointContainer) comServer;
+            var connectionPointContainer = (IConnectionPointContainer)comServer;
 
-            var riid = typeof (T).GUID;
+            var riid = typeof(T).GUID;
             connectionPointContainer.FindConnectionPoint(ref riid, out _connectionPoint);
-            int cookie;
-            _connectionPoint.Advise(_sink, out cookie);
+            _connectionPoint.Advise(_sink, out int cookie);
             _cookie = cookie;
         }
 

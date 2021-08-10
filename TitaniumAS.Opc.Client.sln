@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TitaniumAS.Opc.Client", "TitaniumAS.Opc.Client\TitaniumAS.Opc.Client.csproj", "{0F7347F4-79F1-4C63-8C75-60F8D1A7E950}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TitaniumAS.Opc.Client", "TitaniumAS.Opc.Client\TitaniumAS.Opc.Client.csproj", "{0F7347F4-79F1-4C63-8C75-60F8D1A7E950}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TitaniumAS.Opc.Client.Tests", "TitaniumAS.Opc.Client.Tests\TitaniumAS.Opc.Client.Tests.csproj", "{48DB6542-E413-4864-9B9A-7CEAE825D78C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TitaniumAS.Opc.Client.Tests", "TitaniumAS.Opc.Client.Tests\TitaniumAS.Opc.Client.Tests.csproj", "{48DB6542-E413-4864-9B9A-7CEAE825D78C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6941A238-F19C-406C-B17E-DBBFF9D598B1}
 	EndGlobalSection
 EndGlobal

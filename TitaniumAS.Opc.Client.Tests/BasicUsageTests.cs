@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -153,10 +155,12 @@ namespace TitaniumAS.Opc.Client.Tests
                 server.Connect();
 
                 // Create a group with items.
-                OpcDaGroup group = CreateGroupWithItems(server);
+                using OpcDaGroup group = CreateGroupWithItems(server);
 
+                Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
                 // Read values of items from device asynchronously.
                 OpcDaItemValue[] values = await group.ReadAsync(group.Items);
+                Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
 
                 // Output values
                 foreach (OpcDaItemValue value in values)
@@ -261,7 +265,6 @@ namespace TitaniumAS.Opc.Client.Tests
 
                 // Create a group with items.
                 OpcDaGroup group = CreateGroupWithItems(server);
-
                 // Configure subscription.
                 group.ValuesChanged += OnGroupValuesChanged;
                 group.UpdateRate = TimeSpan.FromMilliseconds(100); // ValuesChanged won't be triggered if zero

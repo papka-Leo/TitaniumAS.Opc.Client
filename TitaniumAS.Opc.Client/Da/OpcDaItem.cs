@@ -22,11 +22,11 @@ namespace TitaniumAS.Opc.Client.Da
             ServerHandle = itemResult.hServer;
             ItemId = itemDefinition.ItemId;
             RequestedDataType = itemDefinition.RequestedDataType;
-            CanonicalDataType = TypeConverter.FromVarEnum((VarEnum) itemResult.vtCanonicalDataType);
+            CanonicalDataType = TypeConverter.FromVarEnum((VarEnum)itemResult.vtCanonicalDataType);
             Blob = itemResult.pBlob;
             AccessPath = itemDefinition.AccessPath;
             IsActive = itemDefinition.IsActive;
-            AccessRights = (OpcDaAccessRights) itemResult.dwAccessRights;
+            AccessRights = (OpcDaAccessRights)itemResult.dwAccessRights;
         }
 
         internal OpcDaItem(OPCITEMATTRIBUTES opcItemDefinition, OpcDaGroup @group)
@@ -35,11 +35,11 @@ namespace TitaniumAS.Opc.Client.Da
             ClientHandle = opcItemDefinition.hClient;
             ServerHandle = opcItemDefinition.hServer;
             ItemId = opcItemDefinition.szItemID;
-            RequestedDataType = TypeConverter.FromVarEnum((VarEnum) opcItemDefinition.vtRequestedDataType);
-            CanonicalDataType = TypeConverter.FromVarEnum((VarEnum) opcItemDefinition.vtCanonicalDataType);
+            RequestedDataType = TypeConverter.FromVarEnum((VarEnum)opcItemDefinition.vtRequestedDataType);
+            CanonicalDataType = TypeConverter.FromVarEnum((VarEnum)opcItemDefinition.vtCanonicalDataType);
             AccessPath = opcItemDefinition.szAccessPath;
             IsActive = opcItemDefinition.bActive;
-            AccessRights = (OpcDaAccessRights) opcItemDefinition.dwAccessRights;
+            AccessRights = (OpcDaAccessRights)opcItemDefinition.dwAccessRights;
             if (opcItemDefinition.pBlob != IntPtr.Zero)
             {
                 Blob = new byte[opcItemDefinition.dwBlobSize];
@@ -174,8 +174,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// </summary>
         protected virtual void OnChanged()
         {
-            var handler = Changed;
-            if (handler != null) handler(this, EventArgs.Empty);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace TitaniumAS.Opc.Client.Da
     /// <seealso cref="System.IComparable{TitaniumAS.Opc.Da.OpcDaQuality}" />
     /// <seealso cref="System.IComparable{System.Int16}" />
     [StructLayout(LayoutKind.Sequential)]
-    public struct OpcDaQuality :
+    public readonly struct OpcDaQuality :
         IComparable
         , IEquatable<OpcDaQuality>
         , IEquatable<short>
@@ -112,7 +112,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// <returns><c>true</c> if specified quality object has the same value as this instance; otherwise, false.</returns>
         public bool Equals(OpcDaQuality that)
         {
-            return (m_value == that.m_value);
+            return m_value == that.m_value;
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace TitaniumAS.Opc.Client.Da
         /// <returns><c>true</c> if specified value is the same as value of this instance; otherwise, false.</returns>
         public bool Equals(short that)
         {
-            return (m_value == that);
+            return m_value == that;
         }
 
         #endregion
@@ -136,16 +136,14 @@ namespace TitaniumAS.Opc.Client.Da
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-            if (obj is OpcDaQuality)
-                return Equals((OpcDaQuality) obj);
-            if (obj is int)
-                return Equals((int) obj);
-            return false;
-        }
+        public override bool Equals(object obj) =>
+            obj switch
+            {
+                null => false,
+                OpcDaQuality quality => Equals(quality),
+                int intQuality => Equals(intQuality),
+                _ => false
+            };
 
         /// <summary>
         /// Returns a hash code for this instance.
@@ -240,15 +238,43 @@ namespace TitaniumAS.Opc.Client.Da
         /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj" /> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj" />. Greater than zero This instance follows <paramref name="obj" /> in the sort order.
         /// </returns>
         /// <exception cref="System.ArgumentException">obj</exception>
-        public int CompareTo(object obj)
+        public int CompareTo(object obj) =>
+            obj switch
+            {
+                null => +1,
+                OpcDaQuality quality => CompareTo(quality),
+                short intQuality => CompareTo(intQuality),
+                _ => throw new ArgumentException("Unsupported type", nameof(obj))
+            };
+
+        public static bool operator ==(OpcDaQuality left, OpcDaQuality right)
         {
-            if (obj == null)
-                return +1;
-            if (obj is OpcDaQuality)
-                return CompareTo((OpcDaQuality) obj);
-            if (obj is short)
-                return CompareTo((short) obj);
-            throw new ArgumentException("obj");
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(OpcDaQuality left, OpcDaQuality right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator <(OpcDaQuality left, OpcDaQuality right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(OpcDaQuality left, OpcDaQuality right)
+        {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >(OpcDaQuality left, OpcDaQuality right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator >=(OpcDaQuality left, OpcDaQuality right)
+        {
+            return left.CompareTo(right) >= 0;
         }
 
         #endregion
