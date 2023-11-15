@@ -871,10 +871,10 @@ namespace TitaniumAS.Opc.Client.Tests.Da
                     group.ReadMaxAge(group.Items, TimeSpan.Zero);
 
                     // async read
-                    Task.WaitAll(group.ReadAsync(group.Items, cts.Token), group.ReadMaxAgeAsync(group.Items,
-                        TimeSpan.Zero, cts.Token),
-                        group.RefreshAsync(OpcDaDataSource.Cache, cts.Token)
-                        );
+                    Task.WaitAll(
+                        group.ReadAsync(group.Items, cts.Token),
+                        group.ReadMaxAgeAsync(group.Items, TimeSpan.Zero, cts.Token),
+                        group.RefreshAsync(OpcDaDataSource.Cache, cts.Token));
 
                     group.RemoveItems(group.Items.Take(group.Items.Count / 2).ToArray());
 
@@ -883,12 +883,13 @@ namespace TitaniumAS.Opc.Client.Tests.Da
                     group.ReadMaxAge(group.Items, TimeSpan.Zero);
 
                     // async read
-                    Task.WaitAll(group.ReadAsync(group.Items, cts.Token), group.ReadMaxAgeAsync(group.Items,
-                        TimeSpan.Zero, cts.Token),
-                        group.RefreshAsync(OpcDaDataSource.Cache, cts.Token)
-                        );
+                    Task.WaitAll(
+                        group.ReadAsync(group.Items, cts.Token),
+                        group.ReadMaxAgeAsync(group.Items, TimeSpan.Zero, cts.Token),
+                        group.RefreshAsync(OpcDaDataSource.Cache, cts.Token));
                 }
             }
+
             GC.Collect();
         }
     }

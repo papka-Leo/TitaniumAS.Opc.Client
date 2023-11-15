@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Schedulers;
 using TitaniumAS.Opc.Client.Common;
 using TitaniumAS.Opc.Client.Da.Wrappers;
+using TitaniumAS.Opc.Client.Schedulers;
 
 namespace TitaniumAS.Opc.Client.Da.Internal.Requests
 {

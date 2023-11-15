@@ -128,31 +128,32 @@ namespace TitaniumAS.Opc.Client.Tests.Da
                 {
                     Value = 0,
                     Quality = (short) OPC_QUALITY_STATUS.BAD
-                }, 
+                },
                 new OpcDaItemValue()
                 {
                     Value = 0,
                     Timestamp = DateTimeOffset.Now-TimeSpan.FromHours(1)
-                }, 
+                },
             };
             HRESULT[] errors = _server.WriteVQT(itemIds, values);
             errors.Should().OnlyContain(hres => hres.Succeeded);
         }
 
-        [TestMethod, Ignore]
+        [Ignore("Нужно запускать от администратора, ломает другие тесты, спользующие Matrikon и работающие параллельно.")]
+        [TestMethod]
         public void Test_Shutdown()
         {
             var g1 = _server.AddGroup("g1");
             g1.IsSubscribed = true;
             g1.IsActive = true;
 
-            AutoResetEvent evnt = new AutoResetEvent(false);
+            AutoResetEvent evnt = new(false);
             _server.Shutdown += (sender, args) => evnt.Set();
-            
-            ServiceController sc = new ServiceController("MatrikonOPC Server for Simulation and Testing");
+
+            using ServiceController sc = new("MatrikonOPC Server for Simulation and Testing");
             sc.Stop();
             evnt.WaitOne();
-            
+
             _server.IsConnected.Should().BeFalse();
             _server.Groups.Should().BeEmpty();
         }
