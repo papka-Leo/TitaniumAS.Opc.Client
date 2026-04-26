@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Common.Logging;
 using TitaniumAS.Opc.Client.Common;
 using TitaniumAS.Opc.Client.Common.Internal;
@@ -14,8 +15,6 @@ using TitaniumAS.Opc.Client.Da.Wrappers;
 using TitaniumAS.Opc.Client.Interop.Common;
 using TitaniumAS.Opc.Client.Interop.Helpers;
 using TitaniumAS.Opc.Client.Interop.System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace TitaniumAS.Opc.Client.Da
 {
@@ -159,10 +158,15 @@ namespace TitaniumAS.Opc.Client.Da
                 return;
 
             Log.TraceFormat("Disconnecting from '{0}' opc server", Uri);
-            if (!rpcFailed)
+            if (rpcFailed)
+            {
+                ComWrapper.RpcFailed -= OnRpcFailed;
+            }
+            else
             {
                 _shutdownConnectionPoint.Disconnect();
             }
+
             RemoveAllGroups(rpcFailed);
 
             if (ComObject != null)
@@ -407,7 +411,7 @@ namespace TitaniumAS.Opc.Client.Da
             // Dispose old groups
             foreach (OpcDaGroup @group in _groups)
             {
-                ((IDisposable) @group).Dispose();
+                ((IDisposable)@group).Dispose();
                 OnGroupsChanged(new OpcDaServerGroupsChangedEventArgs(null, @group));
             }
             _groups.Clear();
@@ -429,7 +433,7 @@ namespace TitaniumAS.Opc.Client.Da
             }
             catch (Exception ex)
             {
-                Log.Error("Disconnect failed.",ex);
+                Log.Error("Disconnect failed.", ex);
             }
             try
             {
@@ -473,7 +477,7 @@ namespace TitaniumAS.Opc.Client.Da
             {
                 if (ComObject == null)
                     return default(T);
-                return (T) Activator.CreateInstance(typeof (T), ComObject, this);
+                return (T)Activator.CreateInstance(typeof(T), ComObject, this);
             }
             catch
             {
@@ -495,7 +499,7 @@ namespace TitaniumAS.Opc.Client.Da
         {
             foreach (OpcDaGroup opcDaGroup in _groups.ToArray())
             {
-                TryRemoveGroup(opcDaGroup,rpcFailed);
+                TryRemoveGroup(opcDaGroup, rpcFailed);
             }
             _groups.Clear();
         }
@@ -519,15 +523,15 @@ namespace TitaniumAS.Opc.Client.Da
 
         private List<string> EnumerateGroupNames(OpcDaEnumScope scope = OpcDaEnumScope.All)
         {
-            object enumeratorObj = As<OpcServer>().CreateGroupEnumerator((int) scope);
-            var enumerator = (IEnumString) enumeratorObj;
+            object enumeratorObj = As<OpcServer>().CreateGroupEnumerator((int)scope);
+            var enumerator = (IEnumString)enumeratorObj;
             return enumerator.EnumareateAllAndRelease(OpcConfiguration.BatchSize);
         }
 
         private List<OpcDaGroup> EnumerateGroups(OpcDaEnumScope scope = OpcDaEnumScope.All)
         {
-            object enumeratorObj = As<OpcServer>().CreateGroupEnumerator((int) scope);
-            var enumerator = (IEnumUnknown) enumeratorObj;
+            object enumeratorObj = As<OpcServer>().CreateGroupEnumerator((int)scope);
+            var enumerator = (IEnumUnknown)enumeratorObj;
             List<object> interfaces = enumerator.EnumareateAllAndRelease(OpcConfiguration.BatchSize);
             return interfaces.Select(i => new OpcDaGroup(i, this)).ToList();
         }
@@ -547,6 +551,7 @@ namespace TitaniumAS.Opc.Client.Da
             {
                 // Free any other managed objects here.
                 //
+                ComWrapper.RpcFailed -= OnRpcFailed;
             }
 
             // Free any unmanaged objects here.
@@ -561,7 +566,7 @@ namespace TitaniumAS.Opc.Client.Da
         {
             try
             {
-                ((IDisposable) @group).Dispose();
+                ((IDisposable)@group).Dispose();
                 if (!rpcFailed)
                 {
                     As<OpcServer>().RemoveGroup(@group.ServerHandle, false);
